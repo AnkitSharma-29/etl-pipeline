@@ -8,6 +8,13 @@ import google.generativeai as genai
 import psycopg2
 import xmltodict
 load_dotenv("/opt/airflow/.env")
+DB_PARAMS = {
+    "dbname": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT")
+}
 
 DATA_DIR = "/opt/airflow/data"
 OUTPUT_CSV = os.path.join(DATA_DIR, "australian_companies.csv")
@@ -161,8 +168,10 @@ def extract_abr_zip(**kwargs):
             print(f"Error writing to {abr_json_path}: {e}")
     except Exception as e:
         print(f"Error in ABR extraction: {e}")
-    
-def match_with_gemini():
+
+
+
+def match_with_gemini(**kwargs):
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
     model = genai.GenerativeModel("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent")
 
@@ -173,7 +182,15 @@ def match_with_gemini():
     matches = []
     for c in crawl_data:
         for a in abr_data:
-            prompt = f"Do these refer to the same company?\nWebsite: {c['company_name']} ({c['website_url']})\nABR: {a['entity_name']} ({a['abn']})\nAnswer YES or NO."
+            prompt = (
+                        f"Do these refer to the same company?\n\n"
+                        f"Website Company:\n"
+                        f"Name: {c['company_name']}\n"
+                        f"URL: {c['website_url']}\n\n"
+                        f"ABR Record:\n"
+                        f"Entity Name: {a['entity_name']}\n"
+                        f"ABN: {a['abn']}\n\n"
+                        f"Answer YES or NO. Just say 'YES' if you are confident they refer to the same company.")
             try:
                 response = model.generate_content(prompt).text.strip().lower()
                 if "yes" in response:
@@ -190,7 +207,7 @@ def match_with_gemini():
         json.dump(matches, f)
     print(f"✅ Matched {len(matches)} entries with Gemini")
 
-def insert_to_postgres():
+def insert_to_postgres(**kwargs):
     with open(f"{DATA_DIR}/matched_data.json") as f:
         data = json.load(f)
     conn = psycopg2.connect(**DB_PARAMS)
