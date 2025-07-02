@@ -1,0 +1,22 @@
+# Airflow extra providers (if needed)
+apache-airflow-providers-postgres
+apache-airflow-providers-redis
+apache-airflow-providers-celery
+
+# Data manipulation and utilities
+pandas
+requests
+
+# For working with compressed files (if needed by your DAGs)
+py7zr
+zipfile36
+
+# For database interaction (if you use SQLAlchemy directly)
+psycopg2-binary
+
+# For Google Gemini integration (if used in your pipeline)
+google-generativeai
+
+# For any custom scripts (add as needed)
+# numpy
+# openpyxl
