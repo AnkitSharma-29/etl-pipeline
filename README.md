@@ -132,7 +132,7 @@ Answer YES or NO.
 
 ## 📌 Contact
 
-For any issues, feel free to open an issue on the GitHub repository or reach out.
+csvtustudent@gmail.com
 
 ---
 
