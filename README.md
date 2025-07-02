@@ -1,110 +1,139 @@
-# ETL Pipeline: Company Data Integration using Airflow & PostgreSQL
+# 🏗️ Company Data ETL Pipeline (Airflow + Docker)
 
-This repository contains a basic ETL (Extract, Transform, Load) pipeline project designed to extract company data, transform and clean it, and load it into a PostgreSQL database. The orchestration is handled by Apache Airflow running in a Docker environment. Entity matching will later be implemented using a Large Language Model (LLM).
+This repository contains an end-to-end ETL pipeline built using **Python**, **Dockerized Apache Airflow**, and **PostgreSQL**. It extracts company data from CommonCrawl and ABR datasets, uses Google's **Gemini API** for entity matching, and stores the matched results into a PostgreSQL database.
 
----
-
-## 🗃️ Dataset
-
-The dataset for this project will include company details extracted from various sources (CSV, API, etc.). It is currently being prepared and stored in the `/data/` directory.
-
----
-
-## 🛠 Installation & Setup
-
-To run this project locally using Docker and Airflow:
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/etl-pipeline.git
-   cd etl-pipeline
-   ```
-
-2. Start Airflow and other services:
-   ```bash
-   docker-compose up --build -d
-   ```
-
-3. Initialize Airflow:
-   ```bash
-   docker-compose run --rm airflow-webserver airflow db init
-   ```
-
-4. Create Airflow Admin user:
-   ```bash
-   docker-compose run --rm airflow-webserver airflow users create \\
-     --username admin --password admin --role Admin \\
-     --firstname Admin --lastname User --email admin@example.com
-   ```
-
-5. Access the Airflow web UI at: [http://localhost:8080](http://localhost:8080)  
-   - Login with:  
-     **Username**: `admin`  
-     **Password**: `admin`
+> 🚧 **Status:** In development phase  
+> ✅ `commoncrawl_extract.py` is working and extracting companies in JSON format  
+> ✅ `abr_extract.py` extracts ABR ZIP to XML and parses data correctly  
+> ❗ Currently troubleshooting **DAGs stuck in "queued" state** due to Airflow-Docker performance issues
 
 ---
 
-## 📁 Project Structure
+## 📦 Features
+
+- Extract `.au` domain company info from **CommonCrawl**
+- Extract **ABN registry** data from zipped **XML (ABR)**
+- Match entries using **Gemini LLM**
+- Load matched data into **PostgreSQL**
+- Orchestrated using **Airflow in Docker**
+
+---
+
+## 🐍 Main Python Libraries Used
+
+```python
+import os, json, zipfile, io, csv, requests
+from urllib.parse import urlparse, urlunparse
+from bs4 import BeautifulSoup
+from warcio.archiveiterator import ArchiveIterator
+import xmltodict
+import google.generativeai as genai
+import psycopg2
+```
+
+---
+
+## 🌀 Airflow DAG Flow
+
+```text
+Extract from CommonCrawl (.au)
+        ↓
+Extract from ABR XML (.zip)
+        ↓
+Match using Gemini LLM
+        ↓
+Load matched companies to PostgreSQL
+```
+
+---
+
+## 📁 Folder Structure
 
 ```
 etl_start/
-├── config/              # Configuration files
-├── dags/                # Airflow DAGs
-├── data/                # Raw/processed data
-├── logs/                # Airflow logs
-├── plugins/             # Airflow plugins (if needed)
-├── venv/                # Local virtual environment (optional)
-├── .env                 # Environment variables
-├── docker-compose.yaml  # Docker service definitions
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation
+├── dags/
+│   └── company_data_etl.py         # Airflow DAG
+├── config/scripts/pipeline_utils.py# Main ETL logic
+├── data/                           # Output JSON, CSV
+├── docker-compose.yaml
+├── .env
+└── requirements.txt
 ```
 
 ---
 
-## 🔄 ETL Flow
+## ⚙️ Technologies Used
 
-- **Extract**: Pull company data from static files or APIs.
-- **Transform**: Clean and normalize data (in progress).
-- **Load**: Insert into PostgreSQL database.
-- **Match**: Use LLM (e.g., Gemini or OpenAI) for fuzzy entity matching (planned).
-
----
-
-## 💡 Technologies Used
-
-- **Apache Airflow** – Workflow orchestration
-- **Docker** – Environment setup
-- **Python** – Data processing scripts
-- **PostgreSQL** – Target database
-- **LLM (Planned)** – Entity resolution/matching
-- **dbt (Planned)** – Transformations and testing
+| Component     | Technology                  |
+|---------------|-----------------------------|
+| Orchestration | Apache Airflow (Docker)     |
+| Extraction    | Python + Requests + Warcio  |
+| Parsing       | BeautifulSoup + xmltodict   |
+| AI Matching   | Google Gemini API           |
+| Storage       | PostgreSQL                  |
+| IDE           | Visual Studio Code          |
 
 ---
 
-## 🧪 Known Issues
+## 🛠️ Setup Instructions
 
-- DAGs may get stuck in a "queued" state (scheduler debugging in progress).
-- Entity matching and dbt models are planned but not yet implemented.
+1. **Clone the Repository**
+```bash
+git clone https://github.com/yourusername/etl-pipeline.git
+cd etl-pipeline
+```
+
+2. **Configure Environment**
+Create a `.env` file with your PostgreSQL and Gemini API key.
+
+3. **Start Docker**
+```bash
+docker-compose up --build -d
+```
+
+4. **Initialize Airflow**
+```bash
+docker-compose run --rm airflow-webserver airflow db init
+```
+
+5. **Create Airflow Admin User**
+```bash
+docker-compose run --rm airflow-webserver airflow users create \
+  --username admin --password admin --role Admin \
+  --firstname Admin --lastname User --email admin@example.com
+```
+
+6. **Visit Airflow UI**
+- http://localhost:8080  
+- Login: `admin` / `admin`
 
 ---
 
-## ✨ Future Improvements
+## ✅ Current Progress
 
-- Integrate LLM-based fuzzy matching (e.g., OpenAI or Gemini)
-- Add dbt for transformations and testing
-- Automate DAG triggers via external API
-- Deploy on cloud (optional)
-
----
-
-## 💻 Development Environment
-
-- **IDE Used**: Visual Studio Code
-- **Recommended Extensions**: Python, Docker, Airflow, dbt
+- [x] CommonCrawl JSON extraction
+- [x] ABR zip to XML + JSON extraction
+- [x] Gemini-based matching
+- [x] Insert into PostgreSQL
+- [ ] DAG stuck in queued state (performance debugging)
 
 ---
 
-## 📌 Note
+## 🤖 Matching Prompt (Gemini)
 
-This project is currently under development and is submitted as part of an assessment. Some components are partially implemented or pending.
+```text
+Do these refer to the same company?
+Website: {company_name} ({url})
+ABR: {entity_name} ({abn})
+Answer YES or NO.
+```
+
+---
+
+## 📌 Contact
+
+For any issues, feel free to open an issue on the GitHub repository or reach out.
+
+---
+
+> Developed by Ankit Sharma 💻
