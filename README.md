@@ -1,21 +1,26 @@
 # 🏗️ Company Data ETL Pipeline (Airflow + Docker)
 
-This repository contains an end-to-end ETL pipeline built using **Python**, **Dockerized Apache Airflow**, and **PostgreSQL**. It extracts company data from CommonCrawl and ABR datasets, uses Google's **Gemini API** for entity matching, and stores the matched results into a PostgreSQL database.
+This repository contains a **complete end-to-end ETL pipeline** built using **Python**, **Dockerized Apache Airflow**, and **PostgreSQL**. It extracts company data from CommonCrawl and ABR datasets, uses **Google's Gemini API** for entity matching, and stores the matched results into a PostgreSQL database.
 
-> 🚧 **Status:** In development phase  
-> ✅ `commoncrawl_extract.py` is working and extracting companies in JSON format  
-> ✅ `abr_extract.py` extracts ABR ZIP to XML and parses data correctly  
-> ❗ Currently troubleshooting **DAGs stuck in "queued" state** due to Airflow-Docker performance issues
+---
+
+## ✅ Project Status: Completed
+
+- ✅ `commoncrawl_extract.py` extracts companies in JSON format  
+- ✅ `abr_extract.py` extracts ABR ZIP to XML and parses data  
+- ✅ Gemini-based entity matching completed  
+- ✅ Matched data inserted into PostgreSQL  
+- ✅ DAGs running successfully in Airflow  
 
 ---
 
 ## 📦 Features
 
-- Extract `.au` domain company info from **CommonCrawl**
-- Extract **ABN registry** data from zipped **XML (ABR)**
-- Match entries using **Gemini LLM**
-- Load matched data into **PostgreSQL**
-- Orchestrated using **Airflow in Docker**
+- 🔍 Extract `.au` domain company info from **CommonCrawl**
+- 📄 Extract **ABN registry data** from zipped XML (ABR)
+- 🧠 **Match company entries** using **Gemini LLM**
+- 💾 **Load matched data** into **PostgreSQL**
+- 🔁 **Orchestration with Apache Airflow** in Dockerized environment
 
 ---
 
@@ -35,7 +40,7 @@ import psycopg2
 
 ## 🌀 Airflow DAG Flow
 
-```text
+```
 Extract from CommonCrawl (.au)
         ↓
 Extract from ABR XML (.zip)
@@ -64,68 +69,63 @@ etl_start/
 
 ## ⚙️ Technologies Used
 
-| Component     | Technology                  |
-|---------------|-----------------------------|
-| Orchestration | Apache Airflow (Docker)     |
-| Extraction    | Python + Requests + Warcio  |
-| Parsing       | BeautifulSoup + xmltodict   |
-| AI Matching   | Google Gemini API           |
-| Storage       | PostgreSQL                  |
-| IDE           | Visual Studio Code          |
+| Component        | Technology                   |
+|------------------|------------------------------|
+| Orchestration     | Apache Airflow (Docker)      |
+| Extraction        | Python + Requests + Warcio   |
+| Parsing           | BeautifulSoup + xmltodict    |
+| AI Matching       | Google Gemini API            |
+| Storage           | PostgreSQL                   |
+| IDE               | Visual Studio Code           |
 
 ---
 
 ## 🛠️ Setup Instructions
 
-1. **Clone the Repository**
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/yourusername/etl-pipeline.git
 cd etl-pipeline
 ```
 
-2. **Configure Environment**
-Create a `.env` file with your PostgreSQL and Gemini API key.
+### 2. Configure Environment
 
-3. **Start Docker**
+Create a `.env` file with your PostgreSQL credentials and Gemini API key.
+
+### 3. Start Docker
+
 ```bash
 docker-compose up --build -d
 ```
 
-4. **Initialize Airflow**
+### 4. Initialize Airflow DB
+
 ```bash
 docker-compose run --rm airflow-webserver airflow db init
 ```
 
-5. **Create Airflow Admin User**
+### 5. Create Airflow Admin User
+
 ```bash
 docker-compose run --rm airflow-webserver airflow users create \
   --username admin --password admin --role Admin \
   --firstname Admin --lastname User --email admin@example.com
 ```
 
-6. **Visit Airflow UI**
-- http://localhost:8080  
-- Login: `admin` / `admin`
+### 6. Access Airflow UI
 
----
-
-## ✅ Current Progress
-
-- [x] **Built the Airflow Docker environment to run this pipeline** ✅
-- [x] CommonCrawl JSON extraction
-- [x] ABR zip to XML + JSON extraction
-- [ ] Gemini-based semantic company matching — 🔧 _in progress_
-- [ ] PostgreSQL insertion — 🔧 _in progress_
-- [ ] DAG stuck in queued state (performance debugging)
+Visit: [http://localhost:8080](http://localhost:8080)  
+Login: `admin` / `admin`
 
 ---
 
 ## 🤖 Matching Prompt (Gemini)
 
 ```text
-Do these refer to the same company?
-Website: {company_name} ({url})
-ABR: {entity_name} ({abn})
+Do these refer to the same company?  
+Website: {company_name} ({url})  
+ABR: {entity_name} ({abn})  
 Answer YES or NO.
 ```
 
@@ -133,8 +133,5 @@ Answer YES or NO.
 
 ## 📌 Contact
 
-csvtustudent@gmail.com
-
----
-
-> Developed by Ankit Sharma 💻
+📧 Email: [csvtustudent@gmail.com](mailto:csvtustudent@gmail.com)  
+👨‍💻 Developed by **Ankit Sharma**
