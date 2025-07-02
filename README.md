@@ -111,10 +111,11 @@ docker-compose run --rm airflow-webserver airflow users create \
 
 ## ✅ Current Progress
 
+- [x] **Built the Airflow Docker environment to run this pipeline** ✅
 - [x] CommonCrawl JSON extraction
 - [x] ABR zip to XML + JSON extraction
-- [x] Gemini-based matching
-- [x] Insert into PostgreSQL
+- [ ] Gemini-based semantic company matching — 🔧 _in progress_
+- [ ] PostgreSQL insertion — 🔧 _in progress_
 - [ ] DAG stuck in queued state (performance debugging)
 
 ---
