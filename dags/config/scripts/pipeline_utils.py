@@ -207,12 +207,29 @@ def match_with_gemini(**kwargs):
         json.dump(matches, f)
     print(f"✅ Matched {len(matches)} entries with Gemini")
 
+from airflow.hooks.base import BaseHook
+import psycopg2
+import json
+
 def insert_to_postgres(**kwargs):
+    conn = BaseHook.get_connection("aus_conntection")
+
+    DB_PARAMS = {
+        "host": "postgres",
+        "port": 5432,
+        "dbname": "airflow",
+        "user": "airflow",
+        "password": "airflow",
+    }
+
+    print("✅ DB_PARAMS:", DB_PARAMS)  # Add this line to debug
+
     with open(f"{DATA_DIR}/matched_data.json") as f:
         data = json.load(f)
-    conn = psycopg2.connect(**DB_PARAMS)
-    cur = conn.cursor()
-    cur.execute("""
+
+    connection = psycopg2.connect(**DB_PARAMS)
+    cursor = connection.cursor()
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS matched_companies (
             abn TEXT PRIMARY KEY,
             company_name TEXT,
@@ -221,12 +238,12 @@ def insert_to_postgres(**kwargs):
         );
     """)
     for row in data:
-        cur.execute("""
+        cursor.execute("""
             INSERT INTO matched_companies (abn, company_name, website_url, state)
             VALUES (%s, %s, %s, %s)
             ON CONFLICT (abn) DO NOTHING;
         """, (row["abn"], row["company_name"], row["website_url"], row["state"]))
-    conn.commit()
-    cur.close()
-    conn.close()
+    connection.commit()
+    cursor.close()
+    connection.close()
     print("✅ Inserted into PostgreSQL")
