@@ -128,6 +128,10 @@ Website: {company_name} ({url})
 ABR: {entity_name} ({abn})  
 Answer YES or NO.
 ```
+![Screenshot 2025-07-03 001914](https://github.com/user-attachments/assets/7d66cda7-0b0c-4902-9ffb-b87182623901)
+![Screenshot 2025-07-03 001453](https://github.com/user-attachments/assets/99d321b9-04ec-4c66-bbfd-21f52394095c)
+![Screenshot 2025-07-02 114937](https://github.com/user-attachments/assets/b85c45e1-efb2-4aa3-9e20-24b03048d560)
+![Screenshot 2025-07-02 114744](https://github.com/user-attachments/assets/4975f5d4-fcd4-47d3-8926-f8af77cd1a82)
 
 ---
 
